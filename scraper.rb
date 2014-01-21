@@ -1,3 +1,4 @@
+require 'scraperwiki'
 require 'mechanize'
 
 def scrape_icon_rest_xml(base_url, query, debug = false)
@@ -36,7 +37,7 @@ def scrape_icon_rest_xml(base_url, query, debug = false)
     if debug
       p record
     else
-      if (ScraperWiki.select("* from swdata where `council_reference`='#{record['council_reference']}'").empty? rescue true)
+      if (ScraperWiki.select("* from data where `council_reference`='#{record['council_reference']}'").empty? rescue true)
         ScraperWiki.save_sqlite(['council_reference'], record)
       else
         puts "Skipping already saved record " + record['council_reference']
