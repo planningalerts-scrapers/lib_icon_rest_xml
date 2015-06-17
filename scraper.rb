@@ -5,11 +5,14 @@ def clean_whitespace(string)
   string.gsub("\r", ' ').gsub("\n", ' ').squeeze(" ").strip
 end
 
-def scrape_icon_rest_xml(base_url, query, debug = false)
-  agent = Mechanize.new
+def scrape_icon_rest_xml(base_url, query, debug = false, agent = nil)
+  agent = Mechanize.new unless agent
   page = agent.get("#{base_url}?#{query}")
+
   # Explicitly interpret as XML
   page = Nokogiri::XML(page.content)
+
+  raise "Can't find any <Application> elements" unless page.search('Application').length > 0
 
   page.search('Application').each do |application|
     application_id = application.at("ApplicationId").inner_text
