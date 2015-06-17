@@ -1,6 +1,10 @@
 require 'scraperwiki'
 require 'mechanize'
 
+def clean_whitespace(string)
+  string.gsub("\r", ' ').gsub("\n", ' ').squeeze(" ").strip
+end
+
 def scrape_icon_rest_xml(base_url, query, debug = false)
   agent = Mechanize.new
   page = agent.get("#{base_url}?#{query}")
