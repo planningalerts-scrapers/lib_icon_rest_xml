@@ -14,9 +14,9 @@ def scrape_icon_rest_xml(base_url, query, debug = false)
   page.search('Application').each do |application|
     application_id = application.at("ApplicationId").inner_text
     info_url = "#{base_url}?id=#{application_id}"
-    address = application.at("Address Line1").inner_text
+    address = clean_whitespace(application.at("Address Line1").inner_text)
     if !application.at('Address Line2').inner_text.empty?
-      address += ", " + application.at("Address Line2").inner_text
+      address += ", " + clean_whitespace(application.at("Address Line2").inner_text)
     end
 
     record = {
