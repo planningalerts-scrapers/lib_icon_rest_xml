@@ -10,6 +10,7 @@ def scrape_icon_rest_xml(base_url, query, debug = false)
   page.search('Application').each do |application|
     application_id = application.at("ApplicationId").inner_text
     info_url = "#{base_url}?id=#{application_id}"
+    address = application.at("Address Line1").inner_text + ", " + application.at("Address Line2").inner_text
     record = {
       "council_reference" => application.at("ReferenceNumber").inner_text,
       "description" => application.at("ApplicationDetails").inner_text,
@@ -17,9 +18,7 @@ def scrape_icon_rest_xml(base_url, query, debug = false)
       # TODO: There can be multiple addresses per application
       # We can't just create a new application for each address as we would then have multiple applications
       # with the same council_reference which isn't currently allowed.
-      "address" =>
-        application.at("Address Line1").inner_text + ", " +
-        application.at("Address Line2").inner_text,
+      "address" => address,
       "date_scraped" => Date.today.to_s,
       "info_url" => info_url,
       # Can't find a specific url for commenting on applications.
