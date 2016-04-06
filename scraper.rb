@@ -15,6 +15,12 @@ def scrape_icon_rest_xml(base_url, query, debug = false, agent = nil)
   raise "Can't find any <Application> elements" unless page.search('Application').length > 0
 
   page.search('Application').each do |application|
+    council_reference = application.at("ReferenceNumber").inner_text
+
+    unless application.at("Address Line1")
+      puts "Skipping due to lack of address for #{council_reference}"
+      next
+    end 
     application_id = application.at("ApplicationId").inner_text
     info_url = "#{base_url}?id=#{application_id}"
 
@@ -24,7 +30,7 @@ def scrape_icon_rest_xml(base_url, query, debug = false, agent = nil)
     end
 
     record = {
-      "council_reference" => application.at("ReferenceNumber").inner_text,
+      "council_reference" => council_reference,
       "description" => application.at("ApplicationDetails").inner_text,
       "date_received" => Date.parse(application.at("LodgementDate").inner_text).to_s,
       # TODO: There can be multiple addresses per application
