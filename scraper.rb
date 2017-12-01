@@ -20,7 +20,7 @@ def scrape_icon_rest_xml(base_url, query, debug = false, agent = nil)
     unless application.at("Address Line1")
       puts "Skipping due to lack of address for #{council_reference}"
       next
-    end 
+    end
     application_id = application.at("ApplicationId").inner_text
     info_url = "#{base_url}?id=#{application_id}"
 
@@ -29,9 +29,20 @@ def scrape_icon_rest_xml(base_url, query, debug = false, agent = nil)
       address += ", " + clean_whitespace(application.at("Address Line2").inner_text)
     end
 
+    if application.at("ApplicationDetails")
+      description = application.at("ApplicationDetails")
+    else
+      description = application.at("SubNatureOfApplication")
+    end
+
+    unless description
+      puts "Skipping due to lack of description for #{council_reference}"
+      next
+    end
+
     record = {
       "council_reference" => council_reference,
-      "description" => application.at("ApplicationDetails").inner_text,
+      "description" => description.inner_text,
       "date_received" => Date.parse(application.at("LodgementDate").inner_text).to_s,
       # TODO: There can be multiple addresses per application
       # We can't just create a new application for each address as we would then have multiple applications
@@ -50,7 +61,7 @@ def scrape_icon_rest_xml(base_url, query, debug = false, agent = nil)
     #  record["on_notice_from"] = Date.parse(e.parent.at("LodgementDate").inner_text).to_s
     #  record["on_notice_to"] = Date.parse(e.parent.at("DateDue").inner_text).to_s
     #end
-  
+
     if debug
       p record
     else
